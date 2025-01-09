@@ -8,11 +8,10 @@ AFloatingActor::AFloatingActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	idx = 0;
+	//input mesh in constructor
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
-
 	RootComponent = MeshComponent;
-
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("StaticMesh'/Game/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'"));
 
 	if (MeshAsset.Succeeded())
@@ -30,13 +29,18 @@ AFloatingActor::AFloatingActor()
 void AFloatingActor::BeginPlay()
 {
 	Super::BeginPlay();
-	Move();
+	OnEvent.BindUObject(this, &AFloatingActor::EventHandler);
+	//Move();
 }
 
 // Called every frame
 void AFloatingActor::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
+	Super::Tick(DeltaTime);	
+	if (idx < 10)
+	{
+		Move();
+		idx++;
+	}
 }
 

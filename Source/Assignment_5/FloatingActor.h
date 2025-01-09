@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "FloatingActor.generated.h"
 
+DECLARE_DELEGATE(FCustomEvent);
+
 UCLASS()
 class ASSIGNMENT_5_API AFloatingActor : public AActor
 {
@@ -14,7 +16,9 @@ class ASSIGNMENT_5_API AFloatingActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AFloatingActor();
-
+	FCustomEvent OnEvent; 
+	TArray<FVector> coordinates;
+	int idx;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -22,6 +26,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void EventHandler()
+	{
+		UE_LOG(LogTemp, Error, TEXT("Event occur"));
+	}
+
 	virtual int Step()
 	{
 		return FMath::RandRange(0, 1);
@@ -36,18 +46,30 @@ public:
 
 	virtual void Move()
 	{
-		int idx = 0;
+		
 		FVector coordinate = GetActorLocation();
-		TArray<FVector> coordinates;
-		while (idx < 10)
-		{
+		
+//		while (idx < 10)
+//		{
 			coordinate.X += Step();
 			coordinate.Y += Step();
 			SetActorLocation(coordinate);
 			coordinates.Add(coordinate);
 			UE_LOG(LogTemp, Warning, TEXT("Actor Location : x:%f, y:%f"), coordinates[idx].X, coordinates[idx].Y);
-			idx++;
-		}
+			if (idx <= 0)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Move distance : %f"), Distance(coordinates[idx], coordinates[idx]));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Move distance : %f"), Distance(coordinates[idx-1], coordinates[idx]));
+			}
+			if (Step())
+			{
+				OnEvent.ExecuteIfBound();
+			}
+//			idx++;
+//		}
 	}
 
 	UPROPERTY(VisibleAnywhere)
